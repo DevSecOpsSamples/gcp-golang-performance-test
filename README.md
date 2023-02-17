@@ -1,1 +1,2 @@
-# gcp-golang-performance-test
+# GCP performance test with golang echo server
+
