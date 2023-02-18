@@ -1,5 +1,7 @@
-# GCP performance test with golang echo server
+# API/Load Balancer performance test with the golang echo server on GKE
 
+[![Build](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test)
 
 ## Prerequisites
 
@@ -101,7 +103,7 @@ bzt echo-bzt.yaml
 ```bash
 kubectl describe hpa go-echo-api-hpa -n echo-test
 
-kubectl get hpa go-echo-api-hpa -n echo-test -w 
+kubectl get hpa go-echo-api-hpa -n echo-test -w
 ```
 
 ## References
