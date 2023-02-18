@@ -3,6 +3,8 @@
 [![Build](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test)
 
+Performance testing with https://echo.labstack.com application on GKE.
+
 ## Prerequisites
 
 ### Installation
@@ -36,7 +38,7 @@ gcloud container clusters create-auto sample-cluster --region=${COMPUTE_ZONE}
 gcloud container clusters get-credentials sample-cluster
 ```
 
-## Deploy go-echo-api
+## Deploy two applications for checking the performance per Pod and scaling
 
 Build and push to GCR:
 
@@ -55,7 +57,32 @@ kubectl get namespaces
 kubectl create namespace echo-test
 ```
 
-Create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-template.yaml](app/go-echo-api-template.yaml) template file.
+Two ddeployments may take around 5 minutes to create a load balancer, including health checking.
+
+### Performance per Pod
+
+To check request per seconds(RPS) WITHOUT scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-onepod-template.yaml](app/go-echo-api-onepod-template.yaml) template file:
+
+```bash
+sed -e "s|<project-id>|${PROJECT_ID}|g" go-echo-api-onepod-template.yaml > go-echo-api-onepod.yaml
+cat go-echo-api-onepod.yaml
+
+kubectl apply -f go-echo-api-onepod.yaml -n echo-test --dry-run=client
+```
+
+Confirm that pod configuration and logs after deployment:
+
+```bash
+kubectl logs -l app=go-echo-api-onepod -n echo-test
+
+kubectl describe pods -n echo-test
+
+kubectl get ingress go-echo-api-onepod-ingress -n echo-test
+```
+
+### Scaling Test
+
+To check request per seconds(RPS) with scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-template.yaml](app/go-echo-api-template.yaml) template file:
 
 ```bash
 sed -e "s|<project-id>|${PROJECT_ID}|g" go-echo-api-template.yaml > go-echo-api.yaml
@@ -67,8 +94,6 @@ kubectl apply -f go-echo-api.yaml -n echo-test --dry-run=client
 ```bash
 kubectl apply -f go-echo-api.yaml -n echo-test
 ```
-
-It may take around 5 minutes to create a load balancer, including health checking.
 
 Confirm that pod configuration and logs after deployment:
 
@@ -93,6 +118,8 @@ curl http://${LB_IP_ADDRESS}/
 
 ## Performance Testing
 
+### Performance of one Pod
+
 ```bash
 cd test
 bzt echo-bzt.yaml
@@ -101,12 +128,42 @@ bzt echo-bzt.yaml
 [test/echo-bzt.yaml](./test/echo-bzt.yaml)
 
 ```bash
+kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
+
+kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
+```
+
+```bash
+kubectl scale deployment go-echo-api-onepod -n echo-test --replicas=2
+```
+
+### Scaling test
+
+```bash
+cd test
+bzt echo-bzt.yaml
+```
+
+```bash
 kubectl describe hpa go-echo-api-hpa -n echo-test
 
 kubectl get hpa go-echo-api-hpa -n echo-test -w
 ```
 
+```bash
+kubectl scale deployment go-echo-api -n echo-test --replicas=0
+```
+
+## Clean up
+
+```bash
+kubectl scale deployment go-echo-api-onepod -n echo-test --replicas=0
+kubectl scale deployment go-echo-api -n echo-test --replicas=0
+```
+
 ## References
+
+- https://echo.labstack.com
 
 - [Cloud SDK > Documentation > Reference > gcloud container clusters](https://cloud.google.com/sdk/gcloud/reference/container/clusters)
 
