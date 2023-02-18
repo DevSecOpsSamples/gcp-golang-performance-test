@@ -1,7 +1,6 @@
 # GCP performance test with golang echo server
 
 
-
 ## Prerequisites
 
 ### Installation
@@ -97,19 +96,12 @@ cd test
 bzt echo-bzt.yaml
 ```
 
-```bash
-# $JMETER_HOME/bin
-./jmeter -t gpu-api.jmx -n  -j ../log/jmeter.log
-```
-
-[test/gpu-api.jmx](./test/gpu-api.jmx)
-
-![prom-dcgm-metric](./screenshots/prom-dcgm-metric.png?raw=true)
-
-![scalingtest-taurus.png](./screenshots/scalingtest-taurus.png?raw=true)
+[test/echo-bzt.yaml](./test/echo-bzt.yaml)
 
 ```bash
-kubectl describe hpa gpu-api-hpa
+kubectl describe hpa go-echo-api-hpa -n echo-test
+
+kubectl get hpa go-echo-api-hpa -n echo-test -w 
 ```
 
 ## References

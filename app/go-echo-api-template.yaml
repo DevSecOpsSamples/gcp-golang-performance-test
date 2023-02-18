@@ -90,11 +90,11 @@ spec:
     kind: Deployment
     name: 'go-echo-api'
   minReplicas: 1
-  maxReplicas: 1
+  maxReplicas: 1000
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
+          averageUtilization: 90
