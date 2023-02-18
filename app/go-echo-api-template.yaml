@@ -1,0 +1,100 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-echo-api
+  namespace: echo-test
+  annotations:
+    app: go-echo-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: go-echo-api
+  template:
+    metadata:
+      labels:
+        app: go-echo-api
+    spec:
+      containers:
+        - name: go-echo-api
+          image: gcr.io/<project-id>/go-echo-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-echo-api
+  namespace: echo-test
+  annotations:
+    app: go-echo-api
+    cloud.google.com/backend-config: '{"default": "go-echo-api-backend-config"}'
+spec:
+  selector:
+    app: go-echo-api
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: go-echo-api-ingress
+  namespace: echo-test
+  annotations:
+    app: go-echo-api
+    kubernetes.io/ingress.class: gce
+spec:
+  rules:
+  - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: go-echo-api
+                port:
+                  number: 8000
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: go-echo-api-backend-config
+  namespace: echo-test
+spec:
+  healthCheck:
+    checkIntervalSec: 10
+    timeoutSec: 30
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    port: 8000
+    type: HTTP
+    requestPath: /
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: go-echo-api-hpa
+  namespace: echo-test
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: 'go-echo-api'
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

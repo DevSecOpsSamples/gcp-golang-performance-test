@@ -1,0 +1,16 @@
+# bzt gpu-api-bzt.yaml
+---
+execution:
+- concurrency: 300
+  ramp-up: 1s
+  # ramp-up: 180s
+  hold-for: 10m
+  # hold-for: 30m
+  scenario: echo-api
+
+scenarios:
+  echo-api:
+    think-time: 0
+    requests:
+    # - https://<alb>.ap-northeast-2.elb.amazonaws.com/
+    - http://34.111.72.78/
