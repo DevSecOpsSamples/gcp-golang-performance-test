@@ -11,6 +11,7 @@ Performance testing with https://echo.labstack.com application on GKE.
 
 - [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
 - [Install kubectl and configure cluster access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
+- [Installing and Upgrading for the Taurus ](https://gettaurus.org/install/Installation/)
 
 ### Set environment variables
 
@@ -138,6 +139,17 @@ kubectl scale deployment go-echo-api-onepod -n echo-test --replicas=2
 ```
 
 ### Scaling test
+
+https://gettaurus.org/install/Installation/
+
+```bash
+sudo apt-get update -y
+sudo apt-get install python3 default-jre-headless python3-tk python3-pip python3-dev libxml2-dev libxslt-dev zlib1g-dev net-tools  -y
+sudo python3 -m pip install bzt
+
+
+sudo apt-get install htop -y
+```
 
 ```bash
 cd test
