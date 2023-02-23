@@ -8,20 +8,13 @@ Performance testing with https://echo.labstack.com application on GKE.
 
 ## Table of Contents
 
-- [Step1: Create a GKE cluster](#1-create-a-gke-cluster)
-- [Step2: Build and push to GCR](#2-build-and-push-to-gcr)
-- [Step3: Ingress with Network Endpoint Group (NEG)](#3-ingress-with-network-endpoint-groupneg)
-    - Manifest
-    - Deploy ingress-neg-api
-    - Screenshots
-- [Step4: LoadBalancer Type with NodePort](#4-loadbalancer-type-with-nodeport)
-    - Manifest
-    - Deploy loadbalancer-type-api
-    - Screenshots
-- [Step5: NodePort Type](#5-nodeport-type)
-    - Manifest
-    - Deploy nodeport-type-api
-    - Create a firewall rule for the node port
+- [1. Create a GKE cluster](#1-create-a-gke-cluster)
+- [2. Deploy two applications for checking the performance per Pod and scaling](#2-deploy-two-applications-for-checking-the-performance-per-pod-and-scaling)
+    - [2.1. Deploy for performance of one Pod](#21-deploy-for-performance-of-one-pod)
+    - [2.2. Deploy for Scaling Test](#22-deploy-for-scaling-test)
+- [3. Performance Testing](#3-performance-testing)
+    - [3.1. Performance of one Pod](31-performance-of-one-pod)
+    - [3.2. Performance with auto scaling](#22-deploy-for-scaling-test)
 - [Cleanup](#6-cleanup)
 
 ---
@@ -141,7 +134,18 @@ curl http://${LB_IP_ADDRESS}/
 
 ## 3. Performance Testing
 
-### 3.1. Performance of one Pod
+### 3.1. Install the Taurus
+
+https://gettaurus.org/install/Installation/
+
+```bash
+sudo apt-get update -y
+sudo apt-get install python3 default-jre-headless python3-tk python3-pip python3-dev libxml2-dev libxslt-dev zlib1g-dev net-tools  -y
+sudo python3 -m pip install bzt
+sudo apt-get install htop -y
+```
+
+### 3.2. Test for performance of one Pod
 
 ```bash
 cd test
@@ -156,16 +160,7 @@ kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
 kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
 ```
 
-### 3.2. Scaling test
-
-https://gettaurus.org/install/Installation/
-
-```bash
-sudo apt-get update -y
-sudo apt-get install python3 default-jre-headless python3-tk python3-pip python3-dev libxml2-dev libxslt-dev zlib1g-dev net-tools  -y
-sudo python3 -m pip install bzt
-sudo apt-get install htop -y
-```
+### 3.3. Test with auto scaling
 
 ```bash
 cd test
