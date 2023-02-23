@@ -2,8 +2,14 @@ FROM golang:1.18 AS builder
 
 RUN mkdir /app
 
-COPY ./go* /app/
-COPY ./*.go /app/
+COPY ./go.mod /app/
+COPY ./go.sum /app/
+COPY ./main.go /app/
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
 
 WORKDIR /app
 
