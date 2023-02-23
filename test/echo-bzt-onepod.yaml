@@ -1,0 +1,14 @@
+# bzt echo-bzt-onepod.yaml
+---
+execution:
+- concurrency: 300
+  ramp-up: 1s
+  hold-for: 10m
+  scenario: echo-api-onepod
+
+scenarios:
+  echo-api-onepod:
+    think-time: 0
+    keepalive: false
+    requests:
+    - http://{extternal-ip}}/
