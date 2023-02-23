@@ -6,10 +6,9 @@ COPY ./go.mod /app/
 COPY ./go.sum /app/
 COPY ./main.go /app/
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
+RUN adduser go
 
-USER nonroot
+USER go
 
 WORKDIR /app
 
