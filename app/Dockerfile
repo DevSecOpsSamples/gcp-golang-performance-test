@@ -5,15 +5,15 @@ RUN mkdir /app
 COPY ./go.mod /app/
 COPY ./go.sum /app/
 COPY ./main.go /app/
-
-RUN adduser go
-
-USER go
-
 WORKDIR /app
 
 RUN go install
 RUN go build main.go
+
+RUN adduser go
+RUN chown ./main go
+
+USER go
 
 EXPOSE 8000
 
