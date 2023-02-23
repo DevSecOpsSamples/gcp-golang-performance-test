@@ -2,7 +2,7 @@ FROM golang:1.18 AS builder
 
 RUN mkdir /app
 
-COPY . /app/
+COPY ./go* /app/
 
 WORKDIR /app
 
