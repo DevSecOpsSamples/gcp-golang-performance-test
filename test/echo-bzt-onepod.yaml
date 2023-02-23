@@ -1,14 +1,13 @@
-# bzt echo-bzt.yaml
+# bzt echo-bzt-onepod.yaml
 ---
 execution:
-- concurrency: 2000
-# - concurrency: 100
+- concurrency: 300
   ramp-up: 1s
   hold-for: 10m
-  scenario: echo-api
+  scenario: echo-api-onepod
 
 scenarios:
-  echo-api:
+  echo-api-onepod:
     think-time: 0
     keepalive: false
     requests:

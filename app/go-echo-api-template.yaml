@@ -40,7 +40,7 @@ spec:
     app: go-echo-api
   type: ClusterIP
   ports:
-    - port: 8000
+    - port: 30001
       targetPort: 8000
       protocol: TCP
 ---
@@ -62,7 +62,7 @@ spec:
               service:
                 name: go-echo-api
                 port:
-                  number: 8000
+                  number: 30001
 ---
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
@@ -70,8 +70,10 @@ metadata:
   name: go-echo-api-backend-config
   namespace: echo-test
 spec:
+  logging:
+    enable: false
   healthCheck:
-    checkIntervalSec: 10
+    checkIntervalSec: 30
     timeoutSec: 30
     healthyThreshold: 1
     unhealthyThreshold: 3

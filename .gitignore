@@ -26,8 +26,8 @@ main
 # k8s template output
 # go-echo-api-onepod-template.yaml
 # go-echo-api-template.yaml
-go-echo-api-onepod.yaml
-go-echo-api.yaml
+**/go-echo-api-onepod.yaml
+**/go-echo-api.yaml
 
 # test
 2023*
