@@ -8,7 +8,7 @@ Performance testing with https://echo.labstack.com application on GKE.
 
 ## Table of Contents
 
-- [Step1: Create a GKE cluster and namespaces](#1-create-a-gke-cluster)
+- [Step1: Create a GKE cluster](#1-create-a-gke-cluster)
 - [Step2: Build and push to GCR](#2-build-and-push-to-gcr)
 - [Step3: Ingress with Network Endpoint Group (NEG)](#3-ingress-with-network-endpoint-groupneg)
     - Manifest
@@ -81,7 +81,7 @@ kubectl create namespace echo-test
 
 Two ddeployments may take around 5 minutes to create a load balancer, including health checking.
 
-## 3. Deploy for performance of one Pod
+## 2.1. Deploy for performance of one Pod
 
 To check request per seconds(RPS) WITHOUT scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-onepod-template.yaml](app/go-echo-api-onepod-template.yaml) template file:
 
@@ -103,7 +103,7 @@ kubectl describe pods -n echo-test
 kubectl get ingress go-echo-api-onepod-ingress -n echo-test
 ```
 
-## 4. Deploy for Scaling Test
+## 2.2. Deploy for Scaling Test
 
 To check request per seconds(RPS) with scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-template.yaml](app/go-echo-api-template.yaml) template file:
 
@@ -139,9 +139,9 @@ echo ${LB_IP_ADDRESS}
 curl http://${LB_IP_ADDRESS}/
 ```
 
-## 5. Performance Testing
+## 3. Performance Testing
 
-### 5.1. Performance of one Pod
+### 3.1. Performance of one Pod
 
 ```bash
 cd test
@@ -156,8 +156,7 @@ kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
 kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
 ```
 
-
-### 5.2. Scaling test
+### 3.2. Scaling test
 
 https://gettaurus.org/install/Installation/
 
