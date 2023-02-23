@@ -11,7 +11,7 @@ RUN go install
 RUN go build main.go
 
 RUN adduser go
-RUN chown ./main go
+RUN chown go ./main
 
 USER go
 
