@@ -1,0 +1,15 @@
+# bzt echo-bzt.yaml
+---
+execution:
+- concurrency: 2000
+# - concurrency: 100
+  ramp-up: 1s
+  hold-for: 10m
+  scenario: echo-api
+
+scenarios:
+  echo-api:
+    think-time: 0
+    keepalive: false
+    requests:
+    - http://{extternal-ip}}/

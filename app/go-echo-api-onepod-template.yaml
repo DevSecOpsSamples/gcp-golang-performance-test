@@ -1,0 +1,102 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-echo-api-onepod
+  namespace: echo-test
+  annotations:
+    app: go-echo-api-onepod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-echo-api-onepod
+  template:
+    metadata:
+      labels:
+        app: go-echo-api-onepod
+    spec:
+      containers:
+        - name: go-echo-api-onepod
+          image: gcr.io/<project-id>/go-echo-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "1"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-echo-api-onepod
+  namespace: echo-test
+  annotations:
+    app: go-echo-api-onepod
+    cloud.google.com/backend-config: '{"default": "go-echo-api-onepod-backend-config"}'
+spec:
+  selector:
+    app: go-echo-api-onepod
+  type: ClusterIP
+  ports:
+    - port: 30000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: go-echo-api-onepod-ingress
+  namespace: echo-test
+  annotations:
+    app: go-echo-api-onepod
+    kubernetes.io/ingress.class: gce
+spec:
+  rules:
+  - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: go-echo-api-onepod
+                port:
+                  number: 30000
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: go-echo-api-onepod-backend-config
+  namespace: echo-test
+spec:
+  logging:
+    enable: false
+  healthCheck:
+    checkIntervalSec: 30
+    timeoutSec: 30
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    port: 8000
+    type: HTTP
+    requestPath: /
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: go-echo-api-onepod-hpa
+  namespace: echo-test
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: go-echo-api-onepod
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 90
