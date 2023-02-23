@@ -13,8 +13,9 @@ Performance testing with https://echo.labstack.com application on GKE.
     - [2.1. Deploy for performance of one Pod](#21-deploy-for-performance-of-one-pod)
     - [2.2. Deploy for Scaling Test](#22-deploy-for-scaling-test)
 - [3. Performance Testing](#3-performance-testing)
-    - [3.1. Performance of one Pod](31-performance-of-one-pod)
-    - [3.2. Performance with auto scaling](#22-deploy-for-scaling-test)
+    - [3.1. Install the Taurus](#31-install-the-taurus)
+    - [3.2. Test for performance of one Pod](#32-test-for-performance-of-one-pod)
+    - [3.3. Test with auto scaling](#33-test-with-auto-scaling)
 - [Cleanup](#6-cleanup)
 
 ---
