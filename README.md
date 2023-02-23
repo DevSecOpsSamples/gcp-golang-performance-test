@@ -178,10 +178,6 @@ kubectl describe hpa go-echo-api-hpa -n echo-test
 kubectl get hpa go-echo-api-hpa -n echo-test -w
 ```
 
-```bash
-kubectl scale deployment go-echo-api -n echo-test --replicas=0
-```
-
 ## Cleanup
 
 ```bash
