@@ -3,25 +3,19 @@
 [![Build](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test)
 
-Performance testing with https://echo.labstack.com application on GKE.
+Performance testing on GKE using the https://echo.labstack.com application.
 
 
 ## Table of Contents
 
-- [Step1: Create a GKE cluster and namespaces](#1-create-a-gke-cluster)
-- [Step2: Build and push to GCR](#2-build-and-push-to-gcr)
-- [Step3: Ingress with Network Endpoint Group (NEG)](#3-ingress-with-network-endpoint-groupneg)
-    - Manifest
-    - Deploy ingress-neg-api
-    - Screenshots
-- [Step4: LoadBalancer Type with NodePort](#4-loadbalancer-type-with-nodeport)
-    - Manifest
-    - Deploy loadbalancer-type-api
-    - Screenshots
-- [Step5: NodePort Type](#5-nodeport-type)
-    - Manifest
-    - Deploy nodeport-type-api
-    - Create a firewall rule for the node port
+- [1. Create a GKE cluster](#1-create-a-gke-cluster)
+- [2. Deploy two applications for checking the performance per Pod and scaling](#2-deploy-two-applications-for-checking-the-performance-per-pod-and-scaling)
+    - [2.1. Deploy for performance of one Pod](#21-deploy-for-performance-of-one-pod)
+    - [2.2. Deploy for Scaling Test](#22-deploy-for-scaling-test)
+- [3. Performance Testing](#3-performance-testing)
+    - [3.1. Install the Taurus](#31-install-the-taurus)
+    - [3.2. Test for performance of one Pod](#32-test-for-performance-of-one-pod)
+    - [3.3. Test with auto scaling](#33-test-with-auto-scaling)
 - [Cleanup](#6-cleanup)
 
 ---
@@ -79,9 +73,9 @@ kubectl get namespaces
 kubectl create namespace echo-test
 ```
 
-Two ddeployments may take around 5 minutes to create a load balancer, including health checking.
+Two deployments may take around 5 minutes to create a load balancer, including health checking.
 
-## 3. Deploy for performance of one Pod
+## 2.1. Deploy for performance of one Pod
 
 To check request per seconds(RPS) WITHOUT scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-onepod-template.yaml](app/go-echo-api-onepod-template.yaml) template file:
 
@@ -93,7 +87,7 @@ kubectl get namespaces
 kubectl apply -f go-echo-api-onepod.yaml -n echo-test --dry-run=client
 ```
 
-Confirm that pod configuration and logs after deployment:
+Confirm Pod logs and configuration after deployment:
 
 ```bash
 kubectl logs -l app=go-echo-api-onepod -n echo-test
@@ -103,7 +97,7 @@ kubectl describe pods -n echo-test
 kubectl get ingress go-echo-api-onepod-ingress -n echo-test
 ```
 
-## 4. Deploy for Scaling Test
+## 2.2. Deploy for Scaling Test
 
 To check request per seconds(RPS) with scaling, create and deploy K8s Deployment, Service, HorizontalPodAutoscaler, Ingress, and GKE BackendConfig using the [go-echo-api-template.yaml](app/go-echo-api-template.yaml) template file:
 
@@ -118,7 +112,7 @@ kubectl apply -f go-echo-api.yaml -n echo-test --dry-run=client
 kubectl apply -f go-echo-api.yaml -n echo-test
 ```
 
-Confirm that pod configuration and logs after deployment:
+Confirm Pod logs and configuration after deployment:
 
 ```bash
 kubectl logs -l app=go-echo-api -n echo-test
@@ -139,25 +133,9 @@ echo ${LB_IP_ADDRESS}
 curl http://${LB_IP_ADDRESS}/
 ```
 
-## 5. Performance Testing
+## 3. Performance Testing
 
-### 5.1. Performance of one Pod
-
-```bash
-cd test
-bzt echo-bzt.yaml
-```
-
-[test/echo-bzt.yaml](./test/echo-bzt.yaml)
-
-```bash
-kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
-
-kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
-```
-
-
-### 5.2. Scaling test
+### 3.1. Install the Taurus
 
 https://gettaurus.org/install/Installation/
 
@@ -168,19 +146,36 @@ sudo python3 -m pip install bzt
 sudo apt-get install htop -y
 ```
 
+### 3.2. Test for performance of one Pod
+
 ```bash
 cd test
+# test with 300 threads and connection:close option
+bzt echo-bzt-onepod.yaml
+```
+
+[test/echo-bzt-onepod.yaml](./test/echo-bzt-onepod.yaml)
+
+```bash
+kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
+
+kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
+```
+
+### 3.3. Test with auto scaling
+
+```bash
+cd test
+# test with 2000 threads and connection:close option
 bzt echo-bzt.yaml
 ```
+
+[test/echo-bzt.yaml](./test/echo-bzt.yaml)
 
 ```bash
 kubectl describe hpa go-echo-api-hpa -n echo-test
 
 kubectl get hpa go-echo-api-hpa -n echo-test -w
-```
-
-```bash
-kubectl scale deployment go-echo-api -n echo-test --replicas=0
 ```
 
 ## Cleanup
