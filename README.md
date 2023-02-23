@@ -150,10 +150,11 @@ sudo apt-get install htop -y
 
 ```bash
 cd test
-bzt echo-bzt.yaml
+# test with 300 threads and connection:close option
+bzt echo-bzt-onepod.yaml
 ```
 
-[test/echo-bzt.yaml](./test/echo-bzt.yaml)
+[test/echo-bzt-onepod.yaml](./test/echo-bzt-onepod.yaml)
 
 ```bash
 kubectl describe hpa go-echo-api-onepod-hpa -n echo-test
@@ -165,8 +166,11 @@ kubectl get hpa go-echo-api-onepod-hpa -n echo-test -w
 
 ```bash
 cd test
+# test with 2000 threads and connection:close option
 bzt echo-bzt.yaml
 ```
+
+[test/echo-bzt.yaml](./test/echo-bzt.yaml)
 
 ```bash
 kubectl describe hpa go-echo-api-hpa -n echo-test
