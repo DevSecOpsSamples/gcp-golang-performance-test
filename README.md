@@ -3,7 +3,7 @@
 [![Build](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test)
 
-Performance testing with https://echo.labstack.com application on GKE.
+Performance testing on GKE using the https://echo.labstack.com application.
 
 
 ## Table of Contents
@@ -73,7 +73,7 @@ kubectl get namespaces
 kubectl create namespace echo-test
 ```
 
-Two ddeployments may take around 5 minutes to create a load balancer, including health checking.
+Two deployments may take around 5 minutes to create a load balancer, including health checking.
 
 ## 2.1. Deploy for performance of one Pod
 
@@ -87,7 +87,7 @@ kubectl get namespaces
 kubectl apply -f go-echo-api-onepod.yaml -n echo-test --dry-run=client
 ```
 
-Confirm that pod configuration and logs after deployment:
+Confirm Pod logs and configuration after deployment:
 
 ```bash
 kubectl logs -l app=go-echo-api-onepod -n echo-test
@@ -112,7 +112,7 @@ kubectl apply -f go-echo-api.yaml -n echo-test --dry-run=client
 kubectl apply -f go-echo-api.yaml -n echo-test
 ```
 
-Confirm that pod configuration and logs after deployment:
+Confirm Pod logs and configuration after deployment:
 
 ```bash
 kubectl logs -l app=go-echo-api -n echo-test
