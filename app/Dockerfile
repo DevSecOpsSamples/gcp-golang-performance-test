@@ -1,20 +1,20 @@
-FROM golang:1.18 AS builder
+FROM golang:1.23-alpine AS builder
 
-RUN mkdir /app
-
-COPY ./go.mod /app/
-COPY ./go.sum /app/
-COPY ./main.go /app/
 WORKDIR /app
 
-RUN go install
-RUN go build main.go
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN adduser go
-RUN chown go ./main
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./
 
-USER go
+FROM scratch
 
-EXPOSE 8000
+WORKDIR /app
 
-CMD ["./main"]
+COPY --from=builder /app/server .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app/server"]

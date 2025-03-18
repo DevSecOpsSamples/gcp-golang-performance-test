@@ -3,19 +3,18 @@
 [![Build](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/DevSecOpsSamples/gcp-golang-performance-test/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=DevSecOpsSamples_gcp-golang-performance-test&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=DevSecOpsSamples_gcp-golang-performance-test)
 
-Performance testing on GKE using the https://echo.labstack.com application.
-
+Performance testing on GKE using the <https://echo.labstack.com> application.
 
 ## Table of Contents
 
 - [1. Create a GKE cluster](#1-create-a-gke-cluster)
 - [2. Deploy two applications for checking the performance per Pod and scaling](#2-deploy-two-applications-for-checking-the-performance-per-pod-and-scaling)
-    - [2.1. Deploy for performance of one Pod](#21-deploy-for-performance-of-one-pod)
-    - [2.2. Deploy for Scaling Test](#22-deploy-for-scaling-test)
+  - [2.1. Deploy for performance of one Pod](#21-deploy-for-performance-of-one-pod)
+  - [2.2. Deploy for Scaling Test](#22-deploy-for-scaling-test)
 - [3. Performance Testing](#3-performance-testing)
-    - [3.1. Install the Taurus](#31-install-the-taurus)
-    - [3.2. Test for performance of one Pod](#32-test-for-performance-of-one-pod)
-    - [3.3. Test with auto scaling](#33-test-with-auto-scaling)
+  - [3.1. Install the Taurus](#31-install-the-taurus)
+  - [3.2. Test for performance of one Pod](#32-test-for-performance-of-one-pod)
+  - [3.3. Test with auto scaling](#33-test-with-auto-scaling)
 - [Cleanup](#6-cleanup)
 
 ---
@@ -26,7 +25,7 @@ Performance testing on GKE using the https://echo.labstack.com application.
 
 - [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
 - [Install kubectl and configure cluster access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
-- [Installing and Upgrading for the Taurus ](https://gettaurus.org/install/Installation/)
+- [Installing and Upgrading for the Taurus](https://gettaurus.org/install/Installation/)
 
 ### Set environment variables
 
@@ -56,21 +55,24 @@ gcloud container clusters get-credentials sample-cluster
 
 ## 2. Deploy two applications for checking the performance per Pod and scaling
 
-Build and push to GCR:
+Build and push to GAR:
 
 ```bash
+gcloud auth login
+gcloud auth configure-docker us-docker.pkg.dev
+
 cd app
 docker build -t go-echo-api . --platform linux/amd64
-docker tag go-echo-api:latest gcr.io/${PROJECT_ID}/go-echo-api:latest
-
-gcloud auth configure-docker
-docker push gcr.io/${PROJECT_ID}/go-echo-api:latest
+docker tag go-echo-api:latest us-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/go-echo-api:latest
+docker push us-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/go-echo-api:latest
 ```
 
-```bash
-kubectl get namespaces
+[build-and-push.sh](app/build-and-push.sh)
 
-kubectl create namespace echo-test
+```bash
+kubectl get ns
+
+kubectl create ns echo-test
 ```
 
 Two deployments may take around 5 minutes to create a load balancer, including health checking.
@@ -137,7 +139,7 @@ curl http://${LB_IP_ADDRESS}/
 
 ### 3.1. Install the Taurus
 
-https://gettaurus.org/install/Installation/
+<https://gettaurus.org/install/Installation/>
 
 ```bash
 sudo apt-get update -y
@@ -186,11 +188,12 @@ kubectl scale deployment go-echo-api -n echo-test --replicas=0
 
 kubectl delete -f app/go-echo-api-onepod.yaml -n echo-test
 kubectl delete -f app/go-echo-api.yaml -n echo-test
+kubectl delete namespace echo-test
 ```
 
 ## References
 
-- https://echo.labstack.com
+- <https://echo.labstack.com>
 
 - [Cloud SDK > Documentation > Reference > gcloud container clusters](https://cloud.google.com/sdk/gcloud/reference/container/clusters)
 
